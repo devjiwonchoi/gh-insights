@@ -1,5 +1,5 @@
 import request from 'supertest'
-import app from '../src/app'
+import app from '../api'
 
 describe('Basic discussions insights', () => {
   it('should return name, login, started, comments, and answers', async () => {
