@@ -4,7 +4,7 @@
   "description": "",
   "main": "./dist/index.js",
   "scripts": {
-    "dev": "dotenv -e .env ts-node src/index.ts",
+    "dev": "dotenv -e .env ts-node ./src/dev-server",
     "test": "dotenv -e .env jest --env node --testTimeout 10000"
   },
   "dependencies": {

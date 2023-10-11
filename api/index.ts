@@ -1,9 +1,9 @@
 import express from 'express'
-import { fetcher, handleDiscussionsRepo } from './utils'
+import { fetcher, handleDiscussionsRepo } from '../src/utils'
 
 const app = express()
 
-app.get('/', async (req, res) => {
+app.get('/api', async (req, res) => {
   const { username, discussions } = req.query
   if (!username) return res.status(400).send('Please provide a valid username')
 
@@ -11,7 +11,7 @@ app.get('/', async (req, res) => {
   let result = {}
 
   if (discussions) {
-    const query: string = require('./queries/discussions').default
+    const query: string = require('../src/queries/discussions').default
     const {
       data: { user },
     } = await fetcher(query, variables)
@@ -19,7 +19,7 @@ app.get('/', async (req, res) => {
 
     const repo = req.query['discussions.repo']
     if (repo) {
-      const query: string = require('./queries/discussions').repo
+      const query: string = require('../src/queries/discussions').repo
       const onlyAnswers = repo === 'answered'
       let nodesArray: any[] = []
       // init loop
