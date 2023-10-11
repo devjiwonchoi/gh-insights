@@ -3,7 +3,7 @@ import { fetcher, handleDiscussionsRepo } from '../src/utils'
 
 const app = express()
 
-app.get('/', async (req, res) => {
+app.get('/api', async (req, res) => {
   const { username, discussions } = req.query
   if (!username) return res.status(400).send('Please provide a valid username')
 
