@@ -2,7 +2,7 @@
   "redirects": [
     {
       "source": "/",
-      "destination": "https://github.com/devjiwonchoi/insights",
+      "destination": "/api",
       "permanent": true
     }
   ]
