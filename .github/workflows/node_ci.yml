@@ -11,10 +11,12 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [18, 20]
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v2
         with:
@@ -38,3 +40,6 @@ jobs:
         env:
           NODE_ENV: test
         run: pnpm test
+
+      - name: Run Lint Check
+        run: pnpm prettier --check .
