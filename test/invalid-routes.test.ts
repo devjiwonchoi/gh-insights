@@ -1,5 +1,5 @@
 import request from 'supertest'
-import app from '../src'
+import app from '../src/app'
 
 describe('Missing username query', () => {
   it('should return 400 status with info message', async () => {
