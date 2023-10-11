@@ -5,9 +5,7 @@
   "main": "./dist/index.js",
   "scripts": {
     "dev": "dotenv -e .env ts-node src/index.ts",
-    "test": "dotenv -e .env jest --env node",
-    "build": "tsc --outDir dist",
-    "start": "dotenv -e .env node dist/index.js"
+    "test": "dotenv -e .env jest --env node"
   },
   "dependencies": {
     "express": "^4.18.2"
