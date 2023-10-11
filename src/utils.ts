@@ -37,7 +37,11 @@ export function handleDiscussionsRepo(nodes: any[]) {
   return Array.from(reposMap.values())
 }
 
-export function handleLanguages(nodes: any[]) {
+export function handleLanguages(
+  nodes: any[],
+  limit?: string,
+  ignored?: string,
+) {
   const languagesMap = new Map<string, number>()
   const languagesColorsMap = new Map<string, string>()
 
@@ -63,7 +67,7 @@ export function handleLanguages(nodes: any[]) {
     })
   })
 
-  const langs = Array.from(languagesMap.entries())
+  let langs = Array.from(languagesMap.entries())
     .map(([name, size]) => ({
       name,
       size,
@@ -76,6 +80,18 @@ export function handleLanguages(nodes: any[]) {
       color,
     }),
   )
+
+  if (limit) {
+    const limitNumber = Number(limit)
+    langs.splice(limitNumber)
+  }
+
+  if (ignored) {
+    const ignoredArray = ignored.split(',').map((lang) => lang.toLowerCase())
+    langs = langs.filter(
+      (lang) => !ignoredArray.includes(lang.name.toLowerCase()),
+    )
+  }
 
   return { langs, langColors }
 }

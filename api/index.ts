@@ -50,6 +50,8 @@ app.get('/api', async (req, res) => {
 
   if (languages) {
     const query: string = require('../src/queries/languages').default
+    const limit = req.query['languages.limit'] as string
+    const ignored = req.query['languages.ignored'] as string
 
     let nodesArray: any[] = []
     // init loop
@@ -70,7 +72,7 @@ app.get('/api', async (req, res) => {
       variables = { ...variables, cursor: endCursor }
       hasNextPage = newHasNextPage
 
-      const langs = handleLanguages(nodesArray)
+      const langs = handleLanguages(nodesArray, limit, ignored)
       result = { ...result, ...langs }
     }
   }
