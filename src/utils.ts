@@ -36,3 +36,62 @@ export function handleDiscussionsRepo(nodes: any[]) {
 
   return Array.from(reposMap.values())
 }
+
+export function handleLanguages(
+  nodes: any[],
+  limit?: string,
+  ignored?: string,
+) {
+  const languagesMap = new Map<string, number>()
+  const languagesColorsMap = new Map<string, string>()
+
+  nodes.forEach((node: any) => {
+    const {
+      languages: { edges },
+    } = node
+
+    edges.forEach((edge: any) => {
+      const { size, node: lang } = edge
+      const { name, color } = lang
+
+      if (languagesMap.has(name)) {
+        const currentSize = languagesMap.get(name)
+        languagesMap.set(name, currentSize + size)
+      } else {
+        languagesMap.set(name, size)
+      }
+
+      if (!languagesColorsMap.has(name)) {
+        languagesColorsMap.set(name, color)
+      }
+    })
+  })
+
+  let langs = Array.from(languagesMap.entries())
+    .map(([name, size]) => ({
+      name,
+      size,
+    }))
+    .sort((a, b) => b.size - a.size)
+
+  const langColors = Array.from(languagesColorsMap.entries()).map(
+    ([name, color]) => ({
+      name,
+      color,
+    }),
+  )
+
+  if (limit) {
+    const limitNumber = Number(limit)
+    langs.splice(limitNumber)
+  }
+
+  if (ignored) {
+    const ignoredArray = ignored.split(',').map((lang) => lang.toLowerCase())
+    langs = langs.filter(
+      (lang) => !ignoredArray.includes(lang.name.toLowerCase()),
+    )
+  }
+
+  return { langs, langColors }
+}
