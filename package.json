@@ -5,7 +5,9 @@
   "main": "./dist/index.js",
   "scripts": {
     "dev": "dotenv -e .env ts-node ./src/dev-server",
-    "test": "dotenv -e .env jest --env node"
+    "test": "dotenv -e .env jest --env node",
+    "lint-fix": "prettier --write .",
+    "prepare": "husky install"
   },
   "dependencies": {
     "express": "^4.18.2"
@@ -18,7 +20,10 @@
     "@types/node": "^20.8.4",
     "@types/supertest": "^2.0.14",
     "dotenv-cli": "^7.3.0",
+    "husky": "^8.0.3",
     "jest": "^29.7.0",
+    "lint-staged": "^14.0.1",
+    "prettier": "^3.0.3",
     "supertest": "^6.3.3",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
@@ -29,6 +34,13 @@
     },
     "verbose": true,
     "testTimeout": 10000
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,md,json,yml}": "prettier --write"
   },
   "license": "MIT",
   "engines": {
