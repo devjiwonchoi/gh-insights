@@ -1,1 +1,1 @@
-export const GITHUB_ACCESS_TOKEN = process.env.GITHUB_ACCESS_TOKEN
+export const TOKEN = process.env.TOKEN

@@ -1,4 +1,4 @@
-import { GITHUB_ACCESS_TOKEN } from './constants'
+import { TOKEN } from './constants'
 
 export async function fetcher(
   query: string,
@@ -6,7 +6,7 @@ export async function fetcher(
 ) {
   const response = await fetch('https://api.github.com/graphql', {
     headers: {
-      Authorization: `Bearer ${GITHUB_ACCESS_TOKEN}`,
+      Authorization: `Bearer ${TOKEN}`,
     },
     method: 'POST',
     body: JSON.stringify({ query, variables }),
