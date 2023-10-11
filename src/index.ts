@@ -1,5 +1,5 @@
 import express from 'express'
-import { fetcher } from './utils'
+import { fetcher, handleDiscussionsRepo } from './utils'
 
 const app = express()
 
@@ -7,13 +7,42 @@ app.get('/', async (req, res) => {
   const { username, discussions } = req.query
   if (!username) return res.status(400).send('Please provide a valid username')
 
-  let variables = { login: username as string }
+  let variables: Record<string, string> = { login: username as string }
   let result = {}
 
   if (discussions) {
-    const query: string = require('./queries/discussions').discussions
-    const data = await fetcher(query, variables)
-    result = { ...result, ...data.data.user }
+    const query: string = require('./queries/discussions').default
+    const {
+      data: { user },
+    } = await fetcher(query, variables)
+    result = { ...result, ...user }
+
+    const repo = req.query['discussions.repo']
+    if (repo) {
+      const query: string = require('./queries/discussions').repo
+      let nodesArray: unknown[] = []
+      // init loop
+      let hasNextPage = true
+
+      while (hasNextPage) {
+        const {
+          data: {
+            user: {
+              repo: {
+                nodes,
+                pageInfo: { hasNextPage: newHasNextPage, endCursor },
+              },
+            },
+          },
+        } = await fetcher(query, variables)
+        nodesArray = [...nodesArray, ...nodes]
+        variables = { ...variables, cursor: endCursor }
+        hasNextPage = newHasNextPage
+      }
+
+      const repos = handleDiscussionsRepo(nodesArray)
+      result = { ...result, repos }
+    }
   }
 
   res.json(result)
