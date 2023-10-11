@@ -36,3 +36,46 @@ export function handleDiscussionsRepo(nodes: any[]) {
 
   return Array.from(reposMap.values())
 }
+
+export function handleLanguages(nodes: any[]) {
+  const languagesMap = new Map<string, number>()
+  const languagesColorsMap = new Map<string, string>()
+
+  nodes.forEach((node: any) => {
+    const {
+      languages: { edges },
+    } = node
+
+    edges.forEach((edge: any) => {
+      const { size, node: lang } = edge
+      const { name, color } = lang
+
+      if (languagesMap.has(name)) {
+        const currentSize = languagesMap.get(name)
+        languagesMap.set(name, currentSize + size)
+      } else {
+        languagesMap.set(name, size)
+      }
+
+      if (!languagesColorsMap.has(name)) {
+        languagesColorsMap.set(name, color)
+      }
+    })
+  })
+
+  const langs = Array.from(languagesMap.entries())
+    .map(([name, size]) => ({
+      name,
+      size,
+    }))
+    .sort((a, b) => b.size - a.size)
+
+  const langColors = Array.from(languagesColorsMap.entries()).map(
+    ([name, color]) => ({
+      name,
+      color,
+    }),
+  )
+
+  return { langs, langColors }
+}

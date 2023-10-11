@@ -1,0 +1,26 @@
+const basic = `
+  query ($login: String!, $cursor: String) {
+    user(login: $login) {
+      ownerRepo: repositories(ownerAffiliations: OWNER, isFork: false, first: 100, after: $cursor) {
+        nodes {
+          name
+          languages(first: 10, orderBy: { field: SIZE, direction: DESC }) {
+            edges {
+              size
+              node {
+                color
+                name
+              }
+            }
+          }
+        }
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
+      }
+    }
+  }
+`
+
+export { basic as default }
