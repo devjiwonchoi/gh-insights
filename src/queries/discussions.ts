@@ -18,9 +18,9 @@ const basic = `
 `
 
 const repo = `
-  query ($login: String!, $cursor: String) {
+  query ($login: String!, $onlyAnswers: Boolean!, $cursor: String) {
     user(login: $login) {
-      repo: repositoryDiscussionComments(first:100, after: $cursor) {
+      repo: repositoryDiscussionComments(first:100, after: $cursor, onlyAnswers: $onlyAnswers) {
         nodes {
           discussion {
             repository {

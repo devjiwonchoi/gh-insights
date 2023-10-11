@@ -7,7 +7,7 @@ app.get('/', async (req, res) => {
   const { username, discussions } = req.query
   if (!username) return res.status(400).send('Please provide a valid username')
 
-  let variables: Record<string, string> = { login: username as string }
+  let variables: Record<string, any> = { login: username as string }
   let result = {}
 
   if (discussions) {
@@ -20,9 +20,12 @@ app.get('/', async (req, res) => {
     const repo = req.query['discussions.repo']
     if (repo) {
       const query: string = require('./queries/discussions').repo
-      let nodesArray: unknown[] = []
+      const onlyAnswers = repo === 'answered'
+      let nodesArray: any[] = []
       // init loop
       let hasNextPage = true
+
+      variables = { ...variables, onlyAnswers }
 
       while (hasNextPage) {
         const {
