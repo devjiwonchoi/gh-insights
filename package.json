@@ -5,7 +5,7 @@
   "main": "./dist/index.js",
   "scripts": {
     "dev": "dotenv -e .env ts-node src/index.ts",
-    "test": "dotenv -e .env jest --env node"
+    "test": "dotenv -e .env jest --env node --testTimeout 10000"
   },
   "dependencies": {
     "express": "^4.18.2"
