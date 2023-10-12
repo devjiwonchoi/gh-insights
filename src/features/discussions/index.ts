@@ -59,10 +59,10 @@ export async function fetchDiscussionsData({
   listRepo: boolean
 }) {
   const defaultQuery = await graphqlParser('discussions', 'default.gql')
-  const withRepoQuery = await graphqlParser('discussions', 'with-repo.gql')
+  const listRepoQuery = await graphqlParser('discussions', 'list-repo.gql')
 
   if (listRepo) {
-    return await fetchDiscussionsRepoList(withRepoQuery, variables)
+    return await fetchDiscussionsRepoList(listRepoQuery, variables)
   }
 
   const {
