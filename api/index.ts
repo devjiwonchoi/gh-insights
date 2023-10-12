@@ -1,5 +1,5 @@
 import express from 'express'
-import handleDiscussions from '../src/features/discussions'
+import { fetchDiscussionsData } from '../src/features'
 import handleLanguages from '../src/features/languages'
 import handleContributions from '../src/features/contributions'
 
@@ -21,6 +21,7 @@ app.get('/api', async (req, res) => {
     })
   }
 
+  const variables: Record<string, any> = { login: username as string }
   let result = {}
 
   if (contributions) {
@@ -45,16 +46,16 @@ app.get('/api', async (req, res) => {
   }
 
   if (discussions) {
-    const repo = req.query['discussions.repo']
-    const listRepo = !!repo
-    const onlyAnswers = repo === 'answered'
-    const discussions = await handleDiscussions({
-      login: username as string,
-      listRepo,
-      onlyAnswers,
-    })
+    const listRepo = !!req.query['discussions.listRepo']
+    const nameWithOwner = listRepo && !!req.query['discussions.nameWithOwner']
+    const onlyAnswers = listRepo && !!req.query['discussions.onlyAnswers']
 
-    result = { ...result, discussions }
+    variables.nameWithOwner = nameWithOwner
+    variables.onlyAnswers = onlyAnswers
+
+    const discussionsData = await fetchDiscussionsData({ variables, listRepo })
+
+    result = { ...result, discussions: discussionsData }
   }
 
   if (languages) {

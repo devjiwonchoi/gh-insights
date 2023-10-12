@@ -1,28 +1,32 @@
 import { fetcher, graphqlParser } from '../../utils'
 
-async function handleNodes(nodes: any[]) {
-  const reposMap = new Map<
-    string,
-    { nameWithOwner: string; avatarUrl: string }
-  >()
+function resolveDiscussionsNodes(nodes: any[]) {
+  // TODO: type this
+  const reposMap = new Map<string, any>()
 
   nodes.forEach((node: any) => {
     const {
       discussion: {
         repository: {
+          name,
           nameWithOwner,
           owner: { avatarUrl },
         },
       },
     } = node
 
-    reposMap.set(nameWithOwner, { nameWithOwner, avatarUrl })
+    if (nameWithOwner) {
+      reposMap.set(nameWithOwner, { repo: nameWithOwner, avatarUrl })
+    } else {
+      reposMap.set(name, { repo: name, avatarUrl })
+    }
   })
 
   return Array.from(reposMap.values())
 }
 
-async function getUserDiscussions(query: string, variables: any) {
+// TODO: type variables
+async function fetchDiscussionsRepoList(query: string, variables: any) {
   let nodesArray: any[] = []
   let hasNextPage = true
 
@@ -30,41 +34,40 @@ async function getUserDiscussions(query: string, variables: any) {
     const {
       data: {
         user: {
-          repo: {
+          repositoryDiscussionComments: {
             nodes,
             pageInfo: { hasNextPage: newHasNextPage, endCursor },
           },
         },
       },
     } = await fetcher(query, variables)
+
     nodesArray = [...nodesArray, ...nodes]
-    variables = { ...variables, cursor: endCursor }
+    variables.cursor = endCursor
     hasNextPage = newHasNextPage
   }
 
-  return await handleNodes(nodesArray)
+  return resolveDiscussionsNodes(nodesArray)
 }
 
-export default async function resolveRequestQueries({
-  login,
+export async function fetchDiscussionsData({
+  variables,
   listRepo = false,
-  onlyAnswers = false,
 }: {
-  login: string
+  // TODO: type variables
+  variables: any
   listRepo: boolean
-  onlyAnswers: boolean
 }) {
   const defaultQuery = await graphqlParser('discussions', 'default.gql')
-  const withRepoQuery = await graphqlParser('discussions', 'with-repo.gql')
-  let variables: Record<string, any> = { login, onlyAnswers }
+  const listRepoQuery = await graphqlParser('discussions', 'list-repo.gql')
 
   if (listRepo) {
-    return await getUserDiscussions(withRepoQuery, variables)
+    return await fetchDiscussionsRepoList(listRepoQuery, variables)
   }
 
   const {
-    data: { user },
+    data: { user: discussionsData },
   } = await fetcher(defaultQuery, variables)
 
-  return user
+  return discussionsData
 }
