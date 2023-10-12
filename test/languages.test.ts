@@ -10,12 +10,12 @@ describe('Basic top languages insights', () => {
     // TODO: Replace this to `image/svg+xml` when we return SVG
     expect(response.type).toEqual('application/json')
     expect(response.body).toHaveProperty('languages')
-    expect(response.body).toHaveProperty('langColors')
+    expect(response.body).toHaveProperty('languageColors')
 
-    const { languages, langColors } = response.body
+    const { languages, languageColors } = response.body
 
     languages.forEach((lang: any, index: number) => {
-      expect(lang).toHaveProperty('name')
+      expect(lang).toHaveProperty('language')
       expect(lang).toHaveProperty('size')
 
       // Check if the languages are in desc order
@@ -24,8 +24,8 @@ describe('Basic top languages insights', () => {
       }
     })
 
-    langColors.forEach((langColor: any) => {
-      expect(langColor).toHaveProperty('name')
+    languageColors.forEach((langColor: any) => {
+      expect(langColor).toHaveProperty('language')
       expect(langColor).toHaveProperty('color')
     })
   })
@@ -53,9 +53,9 @@ describe('Top languages with ignored languages', () => {
 
     const { languages } = response.body
 
-    languages.forEach((lang: any) => {
-      expect(lang.name).not.toEqual('HTML')
-      expect(lang.name).not.toEqual('CSS')
+    languages.forEach(({ language }) => {
+      expect(language).not.toEqual('HTML')
+      expect(language).not.toEqual('CSS')
     })
   })
 })
