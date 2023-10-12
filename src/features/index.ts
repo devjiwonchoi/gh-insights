@@ -1,2 +1,2 @@
-import { handleDiscussions } from './discussions'
-export { handleDiscussions }
+import { fetchDiscussionsData } from './discussions'
+export { fetchDiscussionsData }

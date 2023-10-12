@@ -1,5 +1,5 @@
 import express from 'express'
-import { handleDiscussions } from '../src/features'
+import { fetchDiscussionsData } from '../src/features'
 import handleLanguages from '../src/features/languages'
 import handleContributions from '../src/features/contributions'
 
@@ -51,9 +51,9 @@ app.get('/api', async (req, res) => {
 
     variables.onlyAnswers = onlyAnswers
 
-    const discussions = await handleDiscussions({ variables, listRepo })
+    const discussionsData = await fetchDiscussionsData({ variables, listRepo })
 
-    result = { ...result, discussions }
+    result = { ...result, discussions: discussionsData }
   }
 
   if (languages) {

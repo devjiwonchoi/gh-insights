@@ -45,7 +45,7 @@ async function fetchDiscussionsRepoLists(query: string, variables: any) {
   return await resolveDiscussionsNodes(nodesArray)
 }
 
-export async function handleDiscussions({
+export async function fetchDiscussionsData({
   variables,
   listRepo = false,
 }: {
