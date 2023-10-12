@@ -26,7 +26,9 @@ function resolveDiscussionsNodes(nodes: any[]) {
 }
 
 // TODO: type variables
-async function fetchDiscussionsRepoList(query: string, variables: any) {
+async function fetchDiscussionsRepoList(variables: any) {
+  const listRepoQuery = await graphqlParser('discussions', 'list-repo.gql')
+
   let nodesArray: any[] = []
   let hasNextPage = true
 
@@ -40,7 +42,7 @@ async function fetchDiscussionsRepoList(query: string, variables: any) {
           },
         },
       },
-    } = await fetcher(query, variables)
+    } = await fetcher(listRepoQuery, variables)
 
     nodesArray = [...nodesArray, ...nodes]
     variables.cursor = endCursor
@@ -59,7 +61,6 @@ export async function fetchDiscussionsData({
   listRepo: boolean
 }) {
   const defaultQuery = await graphqlParser('discussions', 'default.gql')
-  const listRepoQuery = await graphqlParser('discussions', 'list-repo.gql')
 
   const {
     data: { user },
@@ -68,7 +69,7 @@ export async function fetchDiscussionsData({
   let discussionsData = { ...user }
 
   if (listRepo) {
-    const repoList = await fetchDiscussionsRepoList(listRepoQuery, variables)
+    const repoList = await fetchDiscussionsRepoList(variables)
     discussionsData = { ...discussionsData, repoList }
   }
 

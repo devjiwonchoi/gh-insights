@@ -1,6 +1,6 @@
 import { fetcher, graphqlParser } from '../../utils'
 
-function handleNodes(nodes: any[], limit?: string, ignored?: string) {
+function resolveLanguagesNodes(nodes: any[], limit?: string, ignored?: string) {
   const languagesMap = new Map<string, number>()
   const languagesColorsMap = new Map<string, string>()
 
@@ -55,8 +55,18 @@ function handleNodes(nodes: any[], limit?: string, ignored?: string) {
   return { languages, langColors }
 }
 
-async function getUserLanguages(variables: any) {
+export async function fetchLanguagesData({
+  variables,
+  limit = '6',
+  ignored,
+}: {
+  // TODO: type variables
+  variables: any
+  limit?: string
+  ignored?: string
+}) {
   const defaultQuery = await graphqlParser('languages', 'default.gql')
+
   let nodesArray: any[] = []
   let hasNextPage = true
 
@@ -72,25 +82,9 @@ async function getUserLanguages(variables: any) {
       },
     } = await fetcher(defaultQuery, variables)
     nodesArray = [...nodesArray, ...nodes]
-    variables = { ...variables, cursor: endCursor }
+    variables.cursor = endCursor
     hasNextPage = newHasNextPage
   }
 
-  return nodesArray
-}
-
-export async function fetchLanguagesData({
-  login,
-  limit,
-  ignored,
-}: {
-  login: string
-  limit?: string
-  ignored?: string
-}) {
-  const nodes = await getUserLanguages({ login })
-
-  const result = handleNodes(nodes, limit, ignored)
-
-  return result
+  return resolveLanguagesNodes(nodesArray, limit, ignored)
 }

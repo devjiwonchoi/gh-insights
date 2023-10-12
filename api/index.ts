@@ -61,11 +61,7 @@ app.get('/api', async (req, res) => {
     const limit = req.query['languages.limit'] as string
     const ignored = req.query['languages.ignored'] as string
 
-    const languages = await fetchLanguagesData({
-      login: username as string,
-      limit,
-      ignored,
-    })
+    const languages = await fetchLanguagesData({ variables, limit, ignored })
     result = { ...result, ...languages }
   }
 
