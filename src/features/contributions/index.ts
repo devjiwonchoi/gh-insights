@@ -1,5 +1,4 @@
-import query from '../../queries/contributions'
-import { fetcher } from '../../utils'
+import { fetcher, graphqlParser } from '../../utils'
 
 function handleNodes(
   nodes: any[],
@@ -52,6 +51,7 @@ function handleNodes(
 }
 
 async function getUserContributions(variables: any) {
+  const defaultQuery = await graphqlParser('contributions', 'default.gql')
   let nodesArray: any[] = []
   // init loop
   let hasNextPage = true
@@ -66,7 +66,7 @@ async function getUserContributions(variables: any) {
           },
         },
       },
-    } = await fetcher(query, variables)
+    } = await fetcher(defaultQuery, variables)
     nodesArray = [...nodesArray, ...nodes]
     variables = { ...variables, cursor: endCursor }
     hasNextPage = newHasNextPage

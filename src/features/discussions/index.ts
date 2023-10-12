@@ -1,5 +1,4 @@
-import query, { repo } from '../../queries/discussions'
-import { fetcher } from '../../utils'
+import { fetcher, graphqlParser } from '../../utils'
 
 async function handleNodes(nodes: any[]) {
   const reposMap = new Map<
@@ -55,15 +54,17 @@ export default async function resolveRequestQueries({
   listRepo: boolean
   onlyAnswers: boolean
 }) {
+  const defaultQuery = await graphqlParser('discussions', 'default.gql')
+  const withRepoQuery = await graphqlParser('discussions', 'with-repo.gql')
   let variables: Record<string, any> = { login, onlyAnswers }
 
   if (listRepo) {
-    return await getUserDiscussions(repo, variables)
+    return await getUserDiscussions(withRepoQuery, variables)
   }
 
   const {
     data: { user },
-  } = await fetcher(query, variables)
+  } = await fetcher(defaultQuery, variables)
 
   return user
 }
