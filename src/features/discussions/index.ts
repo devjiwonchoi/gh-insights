@@ -20,8 +20,7 @@ async function handleNodes(nodes: any[]) {
     reposMap.set(nameWithOwner, { nameWithOwner, avatarUrl })
   })
 
-  const result = Array.from(reposMap.values())
-  return { ...result }
+  return Array.from(reposMap.values())
 }
 
 async function getUserDiscussions(query: string, variables: any) {

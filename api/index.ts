@@ -80,13 +80,13 @@ app.get('/api', async (req, res) => {
     const repo = req.query['discussions.repo']
     const listRepo = !!repo
     const onlyAnswers = repo === 'answered'
-    const userDiscussionsData = await handleDiscussions({
+    const discussions = await handleDiscussions({
       login: username as string,
       listRepo,
       onlyAnswers,
     })
 
-    result = { ...result, ...userDiscussionsData }
+    result = { ...result, discussions }
   }
 
   if (languages) {
