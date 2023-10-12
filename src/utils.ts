@@ -15,28 +15,6 @@ export async function fetcher(
   return await response.json()
 }
 
-export function handleDiscussionsRepo(nodes: any[]) {
-  const reposMap = new Map<
-    string,
-    { nameWithOwner: string; avatarUrl: string }
-  >()
-
-  nodes.forEach((node: any) => {
-    const {
-      discussion: {
-        repository: {
-          nameWithOwner,
-          owner: { avatarUrl },
-        },
-      },
-    } = node
-
-    reposMap.set(nameWithOwner, { nameWithOwner, avatarUrl })
-  })
-
-  return Array.from(reposMap.values())
-}
-
 export function handleLanguages(
   nodes: any[],
   limit?: string,

@@ -1,10 +1,6 @@
 import express from 'express'
-import {
-  fetcher,
-  handleContributions,
-  handleDiscussionsRepo,
-  handleLanguages,
-} from '../src/utils'
+import handleDiscussions from '../src/features/discussions'
+import { fetcher, handleContributions, handleLanguages } from '../src/utils'
 
 const app = express()
 
@@ -81,41 +77,16 @@ app.get('/api', async (req, res) => {
   }
 
   if (discussions) {
-    const query: string = require('../src/queries/discussions').default
-    const {
-      data: { user },
-    } = await fetcher(query, variables)
-    result = { ...result, ...user }
-
     const repo = req.query['discussions.repo']
-    if (repo) {
-      const query: string = require('../src/queries/discussions').repo
-      const onlyAnswers = repo === 'answered'
-      let nodesArray: any[] = []
-      // init loop
-      let hasNextPage = true
+    const listRepo = !!repo
+    const onlyAnswers = repo === 'answered'
+    const userDiscussionsData = await handleDiscussions({
+      login: username as string,
+      listRepo,
+      onlyAnswers,
+    })
 
-      variables = { ...variables, onlyAnswers }
-
-      while (hasNextPage) {
-        const {
-          data: {
-            user: {
-              repo: {
-                nodes,
-                pageInfo: { hasNextPage: newHasNextPage, endCursor },
-              },
-            },
-          },
-        } = await fetcher(query, variables)
-        nodesArray = [...nodesArray, ...nodes]
-        variables = { ...variables, cursor: endCursor }
-        hasNextPage = newHasNextPage
-      }
-
-      const repos = handleDiscussionsRepo(nodesArray)
-      result = { ...result, repos }
-    }
+    result = { ...result, ...userDiscussionsData }
   }
 
   if (languages) {
