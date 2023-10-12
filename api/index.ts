@@ -1,6 +1,9 @@
 import express from 'express'
-import { fetchDiscussionsData, fetchLanguagesData } from '../src/features'
-import handleContributions from '../src/features/contributions'
+import {
+  fetchContributionsData,
+  fetchDiscussionsData,
+  fetchLanguagesData,
+} from '../src/features'
 
 const app = express()
 
@@ -33,7 +36,7 @@ app.get('/api', async (req, res) => {
     // Queries: commit, issue, pull, repo, review
     const type = req.query['contributions.type'] as string
 
-    const contribs = await handleContributions({
+    const contribs = await fetchContributionsData({
       login: username as string,
       stars,
       owner,
@@ -49,10 +52,12 @@ app.get('/api', async (req, res) => {
     const nameWithOwner = listRepo && !!req.query['discussions.nameWithOwner']
     const onlyAnswers = listRepo && !!req.query['discussions.onlyAnswers']
 
-    variables.nameWithOwner = nameWithOwner
-    variables.onlyAnswers = onlyAnswers
+    const discussionsVariables = { ...variables, nameWithOwner, onlyAnswers }
 
-    const discussionsData = await fetchDiscussionsData({ variables, listRepo })
+    const discussionsData = await fetchDiscussionsData({
+      variables: discussionsVariables,
+      listRepo,
+    })
 
     result = { ...result, discussions: discussionsData }
   }

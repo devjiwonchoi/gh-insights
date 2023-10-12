@@ -77,7 +77,7 @@ async function getUserContributions(variables: any) {
   return nodesArray
 }
 
-export default async function resolveRequestQueries({
+export async function fetchContributionsData({
   login,
   stars,
   owner,
