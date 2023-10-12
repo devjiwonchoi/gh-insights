@@ -26,9 +26,11 @@ describe('Discussions', () => {
     expect(response.type).toEqual('application/json')
     expect(response.body).toHaveProperty('discussions')
 
-    const { discussions } = response.body
+    const {
+      discussions: { repoList },
+    } = response.body
 
-    discussions.forEach((repo: any) => {
+    repoList.forEach((repo: any) => {
       expect(repo).toHaveProperty('repo')
       expect(repo).toHaveProperty('avatarUrl')
     })
@@ -43,9 +45,11 @@ describe('Discussions', () => {
     expect(response.type).toEqual('application/json')
     expect(response.body).toHaveProperty('discussions')
 
-    const { discussions } = response.body
+    const {
+      discussions: { repoList },
+    } = response.body
 
-    discussions.forEach((repo: any) => {
+    repoList.forEach((repo: any) => {
       expect(repo).toHaveProperty('repo')
       expect(repo).toHaveProperty('avatarUrl')
     })

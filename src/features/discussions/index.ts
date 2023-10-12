@@ -61,13 +61,16 @@ export async function fetchDiscussionsData({
   const defaultQuery = await graphqlParser('discussions', 'default.gql')
   const listRepoQuery = await graphqlParser('discussions', 'list-repo.gql')
 
-  if (listRepo) {
-    return await fetchDiscussionsRepoList(listRepoQuery, variables)
-  }
-
   const {
-    data: { user: discussionsData },
+    data: { user },
   } = await fetcher(defaultQuery, variables)
+
+  let discussionsData = { ...user }
+
+  if (listRepo) {
+    const repoList = await fetchDiscussionsRepoList(listRepoQuery, variables)
+    discussionsData = { ...discussionsData, repoList }
+  }
 
   return discussionsData
 }
