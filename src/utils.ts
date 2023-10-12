@@ -1,3 +1,5 @@
+import fs from 'fs/promises'
+import path from 'path'
 import { TOKEN } from './constants'
 
 export async function fetcher(
@@ -13,4 +15,24 @@ export async function fetcher(
   })
 
   return await response.json()
+}
+
+export async function graphqlParser(
+  featureName: string,
+  filename: string,
+): Promise<string> {
+  const resolvedFilepath = path.join(
+    __dirname,
+    'features',
+    featureName,
+    filename,
+  )
+  const file = await fs.readFile(resolvedFilepath, 'utf-8')
+
+  const query = file
+    .replace(/\n/g, ' ')
+    .replace(/\s+/g, ' ')
+    .replace(/"/g, '\\"')
+
+  return query
 }
