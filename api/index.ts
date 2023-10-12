@@ -1,6 +1,7 @@
 import express from 'express'
 import handleDiscussions from '../src/features/discussions'
-import { fetcher, handleContributions, handleLanguages } from '../src/utils'
+import handleLanguages from '../src/features/languages'
+import { fetcher, handleContributions } from '../src/utils'
 
 const app = express()
 
@@ -90,32 +91,15 @@ app.get('/api', async (req, res) => {
   }
 
   if (languages) {
-    const query: string = require('../src/queries/languages').default
     const limit = req.query['languages.limit'] as string
     const ignored = req.query['languages.ignored'] as string
 
-    let nodesArray: any[] = []
-    // init loop
-    let hasNextPage = true
-
-    while (hasNextPage) {
-      const {
-        data: {
-          user: {
-            ownerRepo: {
-              nodes,
-              pageInfo: { hasNextPage: newHasNextPage, endCursor },
-            },
-          },
-        },
-      } = await fetcher(query, variables)
-      nodesArray = [...nodesArray, ...nodes]
-      variables = { ...variables, cursor: endCursor }
-      hasNextPage = newHasNextPage
-
-      const langs = handleLanguages(nodesArray, limit, ignored)
-      result = { ...result, ...langs }
-    }
+    const languages = await handleLanguages({
+      login: username as string,
+      limit,
+      ignored,
+    })
+    result = { ...result, ...languages }
   }
 
   res.json(result)
