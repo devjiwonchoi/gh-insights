@@ -121,7 +121,6 @@ export function handleContributions(
     if (accountType !== 'all' && !isInOrganization) return
 
     if (ignored) {
-      console.log(name)
       const ignoredArray = ignored.split(',').map((name) => name.toLowerCase())
       if (
         ignoredArray.includes(name.toLowerCase()) ||
