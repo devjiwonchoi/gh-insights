@@ -1,5 +1,4 @@
-import query from '../../queries/languages'
-import { fetcher } from '../../utils'
+import { fetcher, graphqlParser } from '../../utils'
 
 function handleNodes(nodes: any[], limit?: string, ignored?: string) {
   const languagesMap = new Map<string, number>()
@@ -57,6 +56,7 @@ function handleNodes(nodes: any[], limit?: string, ignored?: string) {
 }
 
 async function getUserLanguages(variables: any) {
+  const defaultQuery = await graphqlParser('languages', 'default.gql')
   let nodesArray: any[] = []
   let hasNextPage = true
 
@@ -70,7 +70,7 @@ async function getUserLanguages(variables: any) {
           },
         },
       },
-    } = await fetcher(query, variables)
+    } = await fetcher(defaultQuery, variables)
     nodesArray = [...nodesArray, ...nodes]
     variables = { ...variables, cursor: endCursor }
     hasNextPage = newHasNextPage
