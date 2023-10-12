@@ -9,15 +9,14 @@ describe('Basic discussions insights', () => {
     expect(response.status).toBe(200)
     // TODO: Replace this to `image/svg+xml` when we return SVG
     expect(response.type).toEqual('application/json')
-    expect(response.body).toHaveProperty('name')
-    expect(response.body).toHaveProperty('login')
-    expect(response.body).toHaveProperty('started')
-    expect(response.body).toHaveProperty('comments')
-    expect(response.body).toHaveProperty('answers')
+    expect(response.body).toHaveProperty('discussions')
+    expect(response.body.discussions).toHaveProperty('started')
+    expect(response.body.discussions).toHaveProperty('comments')
+    expect(response.body.discussions).toHaveProperty('answers')
   })
 })
 
-describe('Repos', () => {
+describe('Discussions', () => {
   it('should return nameWithOwner and avatarUrl of all participated discussions', async () => {
     const response = await request(app).get(
       '/api?username=devjiwonchoi&discussions=1&discussions.repo=all',
@@ -25,11 +24,11 @@ describe('Repos', () => {
     expect(response.status).toBe(200)
     // TODO: Replace this to `image/svg+xml` when we return SVG
     expect(response.type).toEqual('application/json')
-    expect(response.body).toHaveProperty('repos')
+    expect(response.body).toHaveProperty('discussions')
 
-    const { repos } = response.body
+    const { discussions } = response.body
 
-    repos.forEach((repo: any) => {
+    discussions.forEach((repo: any) => {
       expect(repo).toHaveProperty('nameWithOwner')
       expect(repo).toHaveProperty('avatarUrl')
     })
@@ -42,11 +41,11 @@ describe('Repos', () => {
     expect(response.status).toBe(200)
     // TODO: Replace this to `image/svg+xml` when we return SVG
     expect(response.type).toEqual('application/json')
-    expect(response.body).toHaveProperty('repos')
+    expect(response.body).toHaveProperty('discussions')
 
-    const { repos } = response.body
+    const { discussions } = response.body
 
-    repos.forEach((repo: any) => {
+    discussions.forEach((repo: any) => {
       expect(repo).toHaveProperty('nameWithOwner')
       expect(repo).toHaveProperty('avatarUrl')
     })
