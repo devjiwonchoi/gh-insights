@@ -46,17 +46,15 @@ async function getUserDiscussions(query: string, variables: any) {
 }
 
 export default async function resolveRequestQueries({
-  login,
+  variables,
   listRepo = false,
-  onlyAnswers = false,
 }: {
-  login: string
+  // TODO: type variables
+  variables: any
   listRepo: boolean
-  onlyAnswers: boolean
 }) {
   const defaultQuery = await graphqlParser('discussions', 'default.gql')
   const withRepoQuery = await graphqlParser('discussions', 'with-repo.gql')
-  let variables: Record<string, any> = { login, onlyAnswers }
 
   if (listRepo) {
     return await getUserDiscussions(withRepoQuery, variables)

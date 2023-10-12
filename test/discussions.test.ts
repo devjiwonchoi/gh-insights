@@ -19,7 +19,7 @@ describe('Basic discussions insights', () => {
 describe('Discussions', () => {
   it('should return nameWithOwner and avatarUrl of all participated discussions', async () => {
     const response = await request(app).get(
-      '/api?username=devjiwonchoi&discussions=1&discussions.repo=all',
+      '/api?username=devjiwonchoi&discussions=1&discussions.listRepo=1',
     )
     expect(response.status).toBe(200)
     // TODO: Replace this to `image/svg+xml` when we return SVG
@@ -36,7 +36,7 @@ describe('Discussions', () => {
 
   it('should return nameWithOwner and avatarUrl of answered discussions', async () => {
     const response = await request(app).get(
-      '/api?username=devjiwonchoi&discussions=1&discussions.repo=answered',
+      '/api?username=devjiwonchoi&discussions=1&discussions.listRepo=1&discussions.onlyAnswers=1',
     )
     expect(response.status).toBe(200)
     // TODO: Replace this to `image/svg+xml` when we return SVG

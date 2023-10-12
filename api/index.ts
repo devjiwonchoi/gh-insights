@@ -21,6 +21,7 @@ app.get('/api', async (req, res) => {
     })
   }
 
+  const variables: Record<string, any> = { login: username as string }
   let result = {}
 
   if (contributions) {
@@ -45,14 +46,12 @@ app.get('/api', async (req, res) => {
   }
 
   if (discussions) {
-    const repo = req.query['discussions.repo']
-    const listRepo = !!repo
-    const onlyAnswers = repo === 'answered'
-    const discussions = await handleDiscussions({
-      login: username as string,
-      listRepo,
-      onlyAnswers,
-    })
+    const listRepo = !!req.query['discussions.listRepo']
+    const onlyAnswers = !!req.query['discussions.onlyAnswers']
+
+    variables.onlyAnswers = onlyAnswers
+
+    const discussions = await handleDiscussions({ variables, listRepo })
 
     result = { ...result, discussions }
   }
