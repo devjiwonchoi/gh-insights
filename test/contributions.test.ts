@@ -67,9 +67,9 @@ describe('Contributions insights', () => {
     })
   })
 
-  it('should support ignored repos', async () => {
+  it('should support excludes repos', async () => {
     const response = await request(app).get(
-      '/api?username=devjiwonchoi&contributions=1&contributions.ignored=next.js',
+      '/api?username=devjiwonchoi&contributions=1&contributions.excludes=next.js',
     )
     expect(response.status).toBe(200)
     expect(response.type).toEqual('application/json')

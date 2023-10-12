@@ -39,10 +39,10 @@ describe('Top languages with limit', () => {
   })
 })
 
-describe('Top languages with ignored languages', () => {
-  it('should return languages without ignored languages', async () => {
+describe('Top languages with excludes languages', () => {
+  it('should return languages without excludes languages', async () => {
     const response = await request(app).get(
-      '/api?username=devjiwonchoi&languages=1&languages.ignored=html,css',
+      '/api?username=devjiwonchoi&languages=1&languages.excludes=html,css',
     )
     expect(response.status).toBe(200)
 

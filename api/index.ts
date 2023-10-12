@@ -28,7 +28,7 @@ app.get('/api', async (req, res) => {
     const owner = req.query['contributions.owner'] as string
     // Allowed types: org, all
     const accountType = req.query['contributions.accountType'] as string
-    const ignored = req.query['contributions.ignored'] as string
+    const excludes = req.query['contributions.excludes'] as string
     // Allowed types: COMMIT, ISSUE, PULL_REQUEST, REPOSITORY (created), PULL_REQUEST_REVIEW
     // Queries: commit, issue, pull, repo, review
     const type = req.query['contributions.type'] as string
@@ -38,7 +38,7 @@ app.get('/api', async (req, res) => {
       stars,
       owner,
       accountType,
-      ignored,
+      excludes,
       type,
     })
     result = { ...result, contribs }
@@ -59,12 +59,12 @@ app.get('/api', async (req, res) => {
 
   if (languages) {
     const limit = req.query['languages.limit'] as string
-    const ignored = req.query['languages.ignored'] as string
+    const excludes = req.query['languages.excludes'] as string
 
     const languagesData = await fetchLanguagesData({
       variables,
       limit,
-      ignored,
+      excludes,
     })
 
     result = { ...result, languages: languagesData }

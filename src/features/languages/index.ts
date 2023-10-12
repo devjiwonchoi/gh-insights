@@ -1,6 +1,6 @@
 import { fetcher, graphqlParser } from '../../utils'
 
-function resolveLanguagesNodes(nodes: any[], limit: number, ignored?: string) {
+function resolveLanguagesNodes(nodes: any[], limit: number, excludes?: string) {
   const languagesMap = new Map<string, any>()
 
   nodes.forEach((node: any) => {
@@ -27,8 +27,8 @@ function resolveLanguagesNodes(nodes: any[], limit: number, ignored?: string) {
 
   let languages = Array.from(languagesMap.values())
 
-  if (ignored) {
-    const excludesArray = ignored
+  if (excludes) {
+    const excludesArray = excludes
       .split(',')
       .map((language) => language.toLowerCase())
 
@@ -48,12 +48,12 @@ export async function fetchLanguagesData({
   variables,
   // default limit is 6
   limit = '6',
-  ignored,
+  excludes,
 }: {
   // TODO: type variables
   variables: any
   limit: string
-  ignored?: string
+  excludes?: string
 }) {
   const defaultQuery = await graphqlParser('languages', 'default.gql')
 
@@ -76,5 +76,5 @@ export async function fetchLanguagesData({
     hasNextPage = newHasNextPage
   }
 
-  return resolveLanguagesNodes(nodesArray, parseInt(limit), ignored)
+  return resolveLanguagesNodes(nodesArray, parseInt(limit), excludes)
 }
