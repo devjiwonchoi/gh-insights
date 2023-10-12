@@ -10,23 +10,18 @@ describe('Basic top languages insights', () => {
     // TODO: Replace this to `image/svg+xml` when we return SVG
     expect(response.type).toEqual('application/json')
     expect(response.body).toHaveProperty('languages')
-    expect(response.body).toHaveProperty('languageColors')
 
-    const { languages, languageColors } = response.body
+    const { languages } = response.body
 
     languages.forEach((lang: any, index: number) => {
       expect(lang).toHaveProperty('language')
       expect(lang).toHaveProperty('size')
+      expect(lang).toHaveProperty('color')
 
       // Check if the languages are in desc order
       if (index > 0) {
         expect(languages[index - 1].size).toBeGreaterThanOrEqual(lang.size)
       }
-    })
-
-    languageColors.forEach((langColor: any) => {
-      expect(langColor).toHaveProperty('language')
-      expect(langColor).toHaveProperty('color')
     })
   })
 })
