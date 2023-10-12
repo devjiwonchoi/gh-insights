@@ -79,7 +79,7 @@ async function getUserLanguages(variables: any) {
   return nodesArray
 }
 
-export default async function resolveRequestQueries({
+export async function fetchLanguagesData({
   login,
   limit,
   ignored,

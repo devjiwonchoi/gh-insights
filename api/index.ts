@@ -1,6 +1,5 @@
 import express from 'express'
-import { fetchDiscussionsData } from '../src/features'
-import handleLanguages from '../src/features/languages'
+import { fetchDiscussionsData, fetchLanguagesData } from '../src/features'
 import handleContributions from '../src/features/contributions'
 
 const app = express()
@@ -62,7 +61,7 @@ app.get('/api', async (req, res) => {
     const limit = req.query['languages.limit'] as string
     const ignored = req.query['languages.ignored'] as string
 
-    const languages = await handleLanguages({
+    const languages = await fetchLanguagesData({
       login: username as string,
       limit,
       ignored,
