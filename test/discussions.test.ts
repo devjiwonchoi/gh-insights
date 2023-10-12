@@ -17,7 +17,7 @@ describe('Basic discussions insights', () => {
 })
 
 describe('Discussions', () => {
-  it('should return nameWithOwner and avatarUrl of all participated discussions', async () => {
+  it('should return repo and avatarUrl of all participated discussions', async () => {
     const response = await request(app).get(
       '/api?username=devjiwonchoi&discussions=1&discussions.listRepo=1',
     )
@@ -29,12 +29,12 @@ describe('Discussions', () => {
     const { discussions } = response.body
 
     discussions.forEach((repo: any) => {
-      expect(repo).toHaveProperty('nameWithOwner')
+      expect(repo).toHaveProperty('repo')
       expect(repo).toHaveProperty('avatarUrl')
     })
   })
 
-  it('should return nameWithOwner and avatarUrl of answered discussions', async () => {
+  it('should return repo and avatarUrl of answered discussions', async () => {
     const response = await request(app).get(
       '/api?username=devjiwonchoi&discussions=1&discussions.listRepo=1&discussions.onlyAnswers=1',
     )
@@ -46,7 +46,7 @@ describe('Discussions', () => {
     const { discussions } = response.body
 
     discussions.forEach((repo: any) => {
-      expect(repo).toHaveProperty('nameWithOwner')
+      expect(repo).toHaveProperty('repo')
       expect(repo).toHaveProperty('avatarUrl')
     })
   })
