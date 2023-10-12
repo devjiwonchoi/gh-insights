@@ -1,28 +1,32 @@
 import { fetcher, graphqlParser } from '../../utils'
 
-async function resolveDiscussionsNodes(nodes: any[]) {
-  const reposMap = new Map<
-    string,
-    { nameWithOwner: string; avatarUrl: string }
-  >()
+function resolveDiscussionsNodes(nodes: any[]) {
+  // TODO: type this
+  const reposMap = new Map<string, any>()
 
   nodes.forEach((node: any) => {
     const {
       discussion: {
         repository: {
+          name,
           nameWithOwner,
           owner: { avatarUrl },
         },
       },
     } = node
 
-    reposMap.set(nameWithOwner, { nameWithOwner, avatarUrl })
+    if (nameWithOwner) {
+      reposMap.set(nameWithOwner, { repo: nameWithOwner, avatarUrl })
+    } else {
+      reposMap.set(name, { repo: name, avatarUrl })
+    }
   })
 
   return Array.from(reposMap.values())
 }
 
-async function fetchDiscussionsRepoLists(query: string, variables: any) {
+// TODO: type variables
+async function fetchDiscussionsRepoList(query: string, variables: any) {
   let nodesArray: any[] = []
   let hasNextPage = true
 
@@ -30,19 +34,20 @@ async function fetchDiscussionsRepoLists(query: string, variables: any) {
     const {
       data: {
         user: {
-          repo: {
+          repositoryDiscussionComments: {
             nodes,
             pageInfo: { hasNextPage: newHasNextPage, endCursor },
           },
         },
       },
     } = await fetcher(query, variables)
+
     nodesArray = [...nodesArray, ...nodes]
-    variables = { ...variables, cursor: endCursor }
+    variables.cursor = endCursor
     hasNextPage = newHasNextPage
   }
 
-  return await resolveDiscussionsNodes(nodesArray)
+  return resolveDiscussionsNodes(nodesArray)
 }
 
 export async function fetchDiscussionsData({
@@ -57,12 +62,12 @@ export async function fetchDiscussionsData({
   const withRepoQuery = await graphqlParser('discussions', 'with-repo.gql')
 
   if (listRepo) {
-    return await fetchDiscussionsRepoLists(withRepoQuery, variables)
+    return await fetchDiscussionsRepoList(withRepoQuery, variables)
   }
 
   const {
-    data: { user },
+    data: { user: discussionsData },
   } = await fetcher(defaultQuery, variables)
 
-  return user
+  return discussionsData
 }

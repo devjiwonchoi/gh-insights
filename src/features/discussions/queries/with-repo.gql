@@ -1,6 +1,11 @@
-query ($login: String!, $onlyAnswers: Boolean!, $cursor: String) {
+query (
+  $login: String!
+  $nameWithOwner: Boolean!
+  $onlyAnswers: Boolean!
+  $cursor: String
+) {
   user(login: $login) {
-    repo: repositoryDiscussionComments(
+    repositoryDiscussionComments(
       first: 100
       after: $cursor
       onlyAnswers: $onlyAnswers
@@ -8,7 +13,8 @@ query ($login: String!, $onlyAnswers: Boolean!, $cursor: String) {
       nodes {
         discussion {
           repository {
-            nameWithOwner
+            name
+            nameWithOwner @include(if: $nameWithOwner)
             owner {
               avatarUrl
             }

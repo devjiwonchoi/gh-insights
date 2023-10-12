@@ -47,8 +47,10 @@ app.get('/api', async (req, res) => {
 
   if (discussions) {
     const listRepo = !!req.query['discussions.listRepo']
-    const onlyAnswers = !!req.query['discussions.onlyAnswers']
+    const nameWithOwner = listRepo && !!req.query['discussions.nameWithOwner']
+    const onlyAnswers = listRepo && !!req.query['discussions.onlyAnswers']
 
+    variables.nameWithOwner = nameWithOwner
     variables.onlyAnswers = onlyAnswers
 
     const discussionsData = await fetchDiscussionsData({ variables, listRepo })
