@@ -1,6 +1,6 @@
 import { fetcher, graphqlParser } from '../../utils'
 
-async function handleNodes(nodes: any[]) {
+async function resolveDiscussionsNodes(nodes: any[]) {
   const reposMap = new Map<
     string,
     { nameWithOwner: string; avatarUrl: string }
@@ -22,7 +22,7 @@ async function handleNodes(nodes: any[]) {
   return Array.from(reposMap.values())
 }
 
-async function getUserDiscussions(query: string, variables: any) {
+async function fetchDiscussionsRepoLists(query: string, variables: any) {
   let nodesArray: any[] = []
   let hasNextPage = true
 
@@ -42,10 +42,10 @@ async function getUserDiscussions(query: string, variables: any) {
     hasNextPage = newHasNextPage
   }
 
-  return await handleNodes(nodesArray)
+  return await resolveDiscussionsNodes(nodesArray)
 }
 
-export default async function resolveRequestQueries({
+export async function handleDiscussions({
   variables,
   listRepo = false,
 }: {
@@ -57,7 +57,7 @@ export default async function resolveRequestQueries({
   const withRepoQuery = await graphqlParser('discussions', 'with-repo.gql')
 
   if (listRepo) {
-    return await getUserDiscussions(withRepoQuery, variables)
+    return await fetchDiscussionsRepoLists(withRepoQuery, variables)
   }
 
   const {

@@ -1,2 +1,2 @@
-import discussions from './discussions'
-export { discussions as handleDiscussions }
+import { handleDiscussions } from './discussions'
+export { handleDiscussions }
