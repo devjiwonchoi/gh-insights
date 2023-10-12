@@ -7,7 +7,19 @@ const app = express()
 
 app.get('/api', async (req, res) => {
   const { username, contributions, discussions, languages } = req.query
-  if (!username) return res.status(400).send('Please provide a valid username')
+
+  if (!username) {
+    return res
+      .status(400)
+      .json({ message: 'Bad Request. Please provide a valid username.' })
+  }
+
+  if (!process.env.GH_ACCESS_TOKEN) {
+    return res.status(401).json({
+      message:
+        'Invalid GitHub Token. Please report this issue at https://github.com/devjiwonchoi/insights/issues',
+    })
+  }
 
   let result = {}
 
