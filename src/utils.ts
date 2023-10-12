@@ -1,6 +1,5 @@
 import fs from 'fs/promises'
 import path from 'path'
-import { TOKEN } from './constants'
 
 export async function fetcher(
   query: string,
@@ -8,7 +7,7 @@ export async function fetcher(
 ) {
   const response = await fetch('https://api.github.com/graphql', {
     headers: {
-      Authorization: `Bearer ${TOKEN}`,
+      Authorization: `Bearer ${process.env.GH_ACCESS_TOKEN}`,
     },
     method: 'POST',
     body: JSON.stringify({ query, variables }),
