@@ -25,6 +25,7 @@ export async function graphqlParser(
     __dirname,
     'features',
     featureName,
+    'queries',
     filename,
   )
   const file = await fs.readFile(resolvedFilepath, 'utf-8')
