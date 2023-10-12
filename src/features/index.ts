@@ -1,2 +1,4 @@
 import { fetchDiscussionsData } from './discussions'
-export { fetchDiscussionsData }
+import { fetchLanguagesData } from './languages'
+
+export { fetchDiscussionsData, fetchLanguagesData }

@@ -4,7 +4,7 @@ function handleNodes(
   nodes: any[],
   stars?: string,
   accountType?: string,
-  ignored?: string,
+  excludes?: string,
 ) {
   const contribsMap = new Map<string, string>()
 
@@ -24,11 +24,13 @@ function handleNodes(
     // if accountType is 'all', pass all repos. else, pass only isInOrganization repos
     if (accountType !== 'all' && !isInOrganization) return
 
-    if (ignored) {
-      const ignoredArray = ignored.split(',').map((name) => name.toLowerCase())
+    if (excludes) {
+      const excludesArray = excludes
+        .split(',')
+        .map((name) => name.toLowerCase())
       if (
-        ignoredArray.includes(name.toLowerCase()) ||
-        ignoredArray.includes(login.toLowerCase())
+        excludesArray.includes(name.toLowerCase()) ||
+        excludesArray.includes(login.toLowerCase())
       )
         return
     }
@@ -80,14 +82,14 @@ export default async function resolveRequestQueries({
   stars,
   owner,
   accountType,
-  ignored,
+  excludes,
   type,
 }: {
   login: string
   stars: string
   owner: string
   accountType: string
-  ignored: string
+  excludes: string
   type: string
 }) {
   let variables: Record<string, any> = { login }
@@ -115,5 +117,5 @@ export default async function resolveRequestQueries({
 
   const nodesArray = await getUserContributions(variables)
 
-  return handleNodes(nodesArray, stars, accountType, ignored)
+  return handleNodes(nodesArray, stars, accountType, excludes)
 }

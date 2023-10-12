@@ -1,8 +1,7 @@
 import { fetcher, graphqlParser } from '../../utils'
 
-function handleNodes(nodes: any[], limit?: string, ignored?: string) {
-  const languagesMap = new Map<string, number>()
-  const languagesColorsMap = new Map<string, string>()
+function resolveLanguagesNodes(nodes: any[], limit: number, excludes?: string) {
+  const languagesMap = new Map<string, any>()
 
   nodes.forEach((node: any) => {
     const {
@@ -10,53 +9,54 @@ function handleNodes(nodes: any[], limit?: string, ignored?: string) {
     } = node
 
     edges.forEach((edge: any) => {
-      const { size, node: lang } = edge
-      const { name, color } = lang
+      const { size, node } = edge
+      const { name: language, color } = node
 
-      if (languagesMap.has(name)) {
-        const currentSize = languagesMap.get(name)
-        languagesMap.set(name, currentSize + size)
+      if (languagesMap.has(language)) {
+        const currentSize = languagesMap.get(language).size
+        languagesMap.set(language, {
+          language,
+          size: currentSize + size,
+          color,
+        })
       } else {
-        languagesMap.set(name, size)
-      }
-
-      if (!languagesColorsMap.has(name)) {
-        languagesColorsMap.set(name, color)
+        languagesMap.set(language, { language, size, color })
       }
     })
   })
 
-  let languages = Array.from(languagesMap.entries())
-    .map(([name, size]) => ({
-      name,
-      size,
-    }))
-    .sort((a, b) => b.size - a.size)
+  let languages = Array.from(languagesMap.values())
 
-  const langColors = Array.from(languagesColorsMap.entries()).map(
-    ([name, color]) => ({
-      name,
-      color,
-    }),
-  )
+  if (excludes) {
+    const excludesArray = excludes
+      .split(',')
+      .map((language) => language.toLowerCase())
 
-  if (limit) {
-    const limitNumber = Number(limit)
-    languages.splice(limitNumber)
-  }
-
-  if (ignored) {
-    const ignoredArray = ignored.split(',').map((lang) => lang.toLowerCase())
     languages = languages.filter(
-      (lang) => !ignoredArray.includes(lang.name.toLowerCase()),
+      ({ language }) => !excludesArray.includes(language.toLowerCase()),
     )
   }
 
-  return { languages, langColors }
+  languages.sort((a, b) => b.size - a.size)
+  // TODO: find a way to query with limit
+  languages = languages.slice(0, limit)
+
+  return languages
 }
 
-async function getUserLanguages(variables: any) {
+export async function fetchLanguagesData({
+  variables,
+  // default limit is 6
+  limit = '6',
+  excludes,
+}: {
+  // TODO: type variables
+  variables: any
+  limit: string
+  excludes?: string
+}) {
   const defaultQuery = await graphqlParser('languages', 'default.gql')
+
   let nodesArray: any[] = []
   let hasNextPage = true
 
@@ -72,25 +72,9 @@ async function getUserLanguages(variables: any) {
       },
     } = await fetcher(defaultQuery, variables)
     nodesArray = [...nodesArray, ...nodes]
-    variables = { ...variables, cursor: endCursor }
+    variables.cursor = endCursor
     hasNextPage = newHasNextPage
   }
 
-  return nodesArray
-}
-
-export default async function resolveRequestQueries({
-  login,
-  limit,
-  ignored,
-}: {
-  login: string
-  limit?: string
-  ignored?: string
-}) {
-  const nodes = await getUserLanguages({ login })
-
-  const result = handleNodes(nodes, limit, ignored)
-
-  return result
+  return resolveLanguagesNodes(nodesArray, parseInt(limit), excludes)
 }
