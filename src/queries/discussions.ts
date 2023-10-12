@@ -2,8 +2,6 @@
 const basic = `
   query ($login: String!) {
     user(login: $login) {
-      name
-      login
       started: repositoryDiscussions {
         totalCount
       }
