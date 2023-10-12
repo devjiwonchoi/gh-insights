@@ -137,10 +137,12 @@ export function handleContributions(
     }
   })
 
-  const contribs = Array.from(contribsMap.entries()).map(([name, avatar]) => ({
-    name,
-    avatar,
-  }))
+  const contribs = Array.from(contribsMap.entries()).map(
+    ([name, avatarUrl]) => ({
+      name,
+      avatarUrl,
+    }),
+  )
 
   return { contribs }
 }
