@@ -98,7 +98,6 @@ export async function fetchContributionsData({
       data: {
         user: {
           repositoriesContributedTo: {
-            // TODO: totalCount,
             nodes,
             pageInfo: { hasNextPage: newHasNextPage, endCursor },
           },
