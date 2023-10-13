@@ -4,6 +4,7 @@ import {
   fetchDiscussionsData,
   fetchLanguagesData,
 } from '../src/features'
+import { QueryVariables } from '../src/types'
 
 const app = express()
 
@@ -23,7 +24,7 @@ app.get('/api', async (req, res) => {
     })
   }
 
-  const variables: Record<string, any> = { login: username as string }
+  const variables: QueryVariables = { login: username as string }
   let result = {}
 
   if (contributions) {

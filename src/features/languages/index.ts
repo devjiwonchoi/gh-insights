@@ -1,19 +1,20 @@
 import { fetcher, graphqlParser } from '../../utils'
+import { QueryVariables } from '../../types'
 
 function resolveLanguagesNodes(nodes: any[], limit: number, excludes?: string) {
-  const languagesMap = new Map<string, any>()
+  const languagesMap = new Map<
+    string,
+    {
+      language: string
+      size: number
+      color: string
+    }
+  >()
 
-  nodes.forEach((node: any) => {
-    const {
-      languages: { edges },
-    } = node
-
-    edges.forEach((edge: any) => {
-      const { size, node } = edge
-      const { name: language, color } = node
-
+  nodes.forEach(({ languages: { edges } }: any) => {
+    edges.forEach(({ size, node: { name: language, color } }: any) => {
       if (languagesMap.has(language)) {
-        const currentSize = languagesMap.get(language).size
+        const currentSize = languagesMap.get(language)?.size
         languagesMap.set(language, {
           language,
           size: currentSize + size,
@@ -50,8 +51,7 @@ export async function fetchLanguagesData({
   limit = '6',
   excludes,
 }: {
-  // TODO: type variables
-  variables: any
+  variables: QueryVariables
   limit: string
   excludes?: string
 }) {

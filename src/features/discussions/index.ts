@@ -1,11 +1,17 @@
 import { fetcher, graphqlParser } from '../../utils'
+import { QueryVariables } from '../../types'
 
 function resolveDiscussionsNodes(nodes: any[]) {
-  // TODO: type this
-  const reposMap = new Map<string, any>()
+  const reposMap = new Map<
+    string,
+    {
+      repo: string
+      avatarUrl: string
+    }
+  >()
 
-  nodes.forEach((node: any) => {
-    const {
+  nodes.forEach(
+    ({
       discussion: {
         repository: {
           name,
@@ -13,20 +19,19 @@ function resolveDiscussionsNodes(nodes: any[]) {
           owner: { avatarUrl },
         },
       },
-    } = node
-
-    if (nameWithOwner) {
-      reposMap.set(nameWithOwner, { repo: nameWithOwner, avatarUrl })
-    } else {
-      reposMap.set(name, { repo: name, avatarUrl })
-    }
-  })
+    }: any) => {
+      if (nameWithOwner) {
+        reposMap.set(nameWithOwner, { repo: nameWithOwner, avatarUrl })
+      } else {
+        reposMap.set(name, { repo: name, avatarUrl })
+      }
+    },
+  )
 
   return Array.from(reposMap.values())
 }
 
-// TODO: type variables
-async function fetchDiscussionsRepoList(variables: any) {
+async function fetchDiscussionsRepoList(variables: QueryVariables) {
   const listRepoQuery = await graphqlParser('discussions', 'list-repo.gql')
 
   let nodesArray: any[] = []
@@ -56,8 +61,7 @@ export async function fetchDiscussionsData({
   variables,
   listRepo = false,
 }: {
-  // TODO: type variables
-  variables: any
+  variables: QueryVariables
   listRepo: boolean
 }) {
   const defaultQuery = await graphqlParser('discussions', 'default.gql')

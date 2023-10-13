@@ -1,10 +1,8 @@
 import fs from 'fs/promises'
 import path from 'path'
+import { QueryVariables } from './types'
 
-export async function fetcher(
-  query: string,
-  variables: Record<string, string>,
-) {
+export async function fetcher(query: string, variables: QueryVariables) {
   const response = await fetch('https://api.github.com/graphql', {
     headers: {
       Authorization: `Bearer ${process.env.GH_ACCESS_TOKEN}`,
