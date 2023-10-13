@@ -31,6 +31,8 @@ By default, returns repos created by organizations.
 
 ## Exclude certain repos (with owner or repo name) - `contributions.exclude`
 
+Note: case-insensitive.
+
 > [https://gh-insights.vercel.app/api?username=devjiwonchoi&contributions=1&contributions.repoExcludes=vercel,vscode](https://gh-insights.vercel.app/api?username=devjiwonchoi&contributions=1&contributions.repoExcludes=vercel,vscode)
 
 ## Limit by contribution types - `contributions.contributionTypes`

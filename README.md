@@ -11,3 +11,7 @@ See [src/features/contributions/README.md](./src/features/contributions/README.m
 ### Discussions
 
 See [src/features/discussions/README.md](./src/features/discussions/README.md)
+
+### Languages
+
+See [src/features/languages/README.md](./src/features/languages/README.md)
