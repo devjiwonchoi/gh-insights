@@ -3,5 +3,12 @@ export type QueryVariables = {
   cursor?: string
   nameWithOwner?: boolean
   onlyAnswers?: boolean
-  contributionTypes?: string[]
+  contributionTypes?: ContributionType[]
 }
+
+export type ContributionType =
+  | 'COMMIT'
+  | 'ISSUE'
+  | 'PULL_REQUEST'
+  | 'REPOSITORY'
+  | 'PULL_REQUEST_REVIEW'
