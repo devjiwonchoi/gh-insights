@@ -1,83 +1,113 @@
-import request from 'supertest'
-import app from '../api'
+import { mockRequest } from './test-utils'
 
-describe('Contributions insights', () => {
-  it('should return basic', async () => {
-    const response = await request(app).get(
-      '/api?username=devjiwonchoi&contributions=1',
-    )
-    expect(response.status).toBe(200)
-    expect(response.type).toEqual('application/json')
-    expect(response.body).toHaveProperty('contributions')
+describe('Contributions Insights API', () => {
+  it('should support basic API', async () => {
+    const res = await mockRequest('&contributions=1')
 
-    const { contributions } = response.body
+    expect(res.body).toHaveProperty('contributions')
 
-    contributions.forEach((contrib: any) => {
-      expect(contrib).toHaveProperty('repo')
-      expect(contrib).toHaveProperty('avatarUrl')
+    const { contributions } = res.body
+
+    expect(Array.isArray(contributions)).toBe(true)
+    const contributionsRepoArray = contributions.map((contribution: any) => {
+      expect(contribution).toHaveProperty('repo')
+      expect(contribution).toHaveProperty('avatarUrl')
+
+      return contribution.repo
     })
+
+    expect(contributionsRepoArray).toContain('nextjs.guide')
   })
 
-  it('should filter by repoStars', async () => {
-    const response = await request(app).get(
-      '/api?username=devjiwonchoi&contributions=1&contributions.repoStars=100',
+  it('should support limit by repoStars', async () => {
+    const res = await mockRequest(
+      '&contributions=1&contributions.repoStars=100000',
     )
-    expect(response.status).toBe(200)
-    expect(response.type).toEqual('application/json')
-    expect(response.body).toHaveProperty('contributions')
 
-    const { contributions } = response.body
+    const { contributions } = res.body
 
-    contributions.forEach((contrib: any) => {
-      expect(contrib).toHaveProperty('repo')
-      expect(contrib).toHaveProperty('avatarUrl')
-    })
+    const contributionsRepoArray = contributions.map(
+      ({ repo }: { repo: string }) => repo,
+    )
+
+    expect(contributionsRepoArray).toContain('next.js')
+    expect(contributionsRepoArray).not.toContain('nextjs.guide')
+  })
+
+  it('should exclude repos in repoExcludes with organization name', async () => {
+    const res = await mockRequest(
+      '&contributions=1&contributions.repoExcludes=vercel',
+    )
+
+    const { contributions } = res.body
+
+    const contributionsRepoArray = contributions.map(
+      ({ repo }: { repo: string }) => repo,
+    )
+
+    expect(contributionsRepoArray).not.toContain('next.js')
+    expect(contributionsRepoArray).not.toContain('ai')
+    expect(contributionsRepoArray).not.toContain('swr')
+  })
+
+  it('should exclude repos in repoExcludes with repository name', async () => {
+    const res = await mockRequest(
+      '&contributions=1&contributions.repoExcludes=next.js',
+    )
+
+    const { contributions } = res.body
+
+    const contributionsRepoArray = contributions.map(
+      ({ repo }: { repo: string }) => repo,
+    )
+
+    expect(contributionsRepoArray).not.toContain('next.js')
+    expect(contributionsRepoArray).toContain('ai')
+    expect(contributionsRepoArray).toContain('swr')
+  })
+
+  it('should support limit by contributionTypes', async () => {
+    const res = await mockRequest(
+      '&contributions=1&contributions.contributionTypes=commit',
+    )
+
+    const { contributions } = res.body
+
+    const contributionsRepoArray = contributions.map(
+      ({ repo }: { repo: string }) => repo,
+    )
+
+    expect(contributionsRepoArray).toContain('next.js')
   })
 
   it('should support includeUserRepo', async () => {
-    const response = await request(app).get(
-      '/api?username=devjiwonchoi&contributions=1&contributions.includeUserRepo=1',
+    const res = await mockRequest(
+      '&contributions=1&contributions.includeUserRepo=1',
     )
-    expect(response.status).toBe(200)
-    expect(response.type).toEqual('application/json')
-    expect(response.body).toHaveProperty('contributions')
 
-    const { contributions } = response.body
+    const { contributions } = res.body
 
-    expect(contributions.some(({ repo }) => repo === 'bunchee')).toBe(true)
+    const contributionsRepoArray = contributions.map(
+      ({ repo }: { repo: string }) => repo,
+    )
+
+    expect(contributionsRepoArray).toContain('bunchee')
   })
 
   it('should support nameWithOwner', async () => {
-    const response = await request(app).get(
-      '/api?username=devjiwonchoi&contributions=1&contributions.nameWithOwner=1',
+    const res = await mockRequest(
+      '&contributions=1&contributions.nameWithOwner=1',
     )
-    expect(response.status).toBe(200)
-    expect(response.type).toEqual('application/json')
-    expect(response.body).toHaveProperty('contributions')
 
-    const { contributions } = response.body
+    const { contributions } = res.body
 
-    contributions.forEach((contrib: any) => {
-      expect(contrib).toHaveProperty('repo')
-      expect(contrib).toHaveProperty('avatarUrl')
-      expect(contrib.repo).toContain('/')
-    })
-  })
-
-  it('should support excludes repos', async () => {
-    const response = await request(app).get(
-      '/api?username=devjiwonchoi&contributions=1&contributions.repoExcludes=next.js',
+    const contributionsRepoArray = contributions.map(
+      ({ repo }: { repo: string }) => repo,
     )
-    expect(response.status).toBe(200)
-    expect(response.type).toEqual('application/json')
-    expect(response.body).toHaveProperty('contributions')
 
-    const { contributions } = response.body
-
-    contributions.forEach((contrib) => {
-      expect(contrib).toHaveProperty('repo')
-      expect(contrib).toHaveProperty('avatarUrl')
-      expect(contrib.repo).not.toContain('next.js')
-    })
+    expect(contributionsRepoArray).toContain('vercel/next.js')
+    expect(contributionsRepoArray).toContain('microsoft/TypeScript')
+    expect(contributionsRepoArray).not.toContain('next.js')
+    expect(contributionsRepoArray).not.toContain('TypeScript')
   })
 })

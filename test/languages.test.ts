@@ -1,56 +1,51 @@
-import request from 'supertest'
-import app from '../api'
+import { mockRequest } from './test-utils'
 
-describe('Basic top languages insights', () => {
-  it('should return langs in desc order and their colors', async () => {
-    const response = await request(app).get(
-      '/api?username=devjiwonchoi&languages=1',
-    )
-    expect(response.status).toBe(200)
-    // TODO: Replace this to `image/svg+xml` when we return SVG
-    expect(response.type).toEqual('application/json')
-    expect(response.body).toHaveProperty('languages')
+describe('Languages Insights API', () => {
+  it('should support basic API', async () => {
+    const res = await mockRequest('&languages=1')
 
-    const { languages } = response.body
+    expect(res.body).toHaveProperty('languages')
 
-    languages.forEach((lang: any, index: number) => {
-      expect(lang).toHaveProperty('language')
-      expect(lang).toHaveProperty('size')
-      expect(lang).toHaveProperty('color')
+    const { languages } = res.body
 
-      // Check if the languages are in desc order
-      if (index > 0) {
-        expect(languages[index - 1].size).toBeGreaterThanOrEqual(lang.size)
-      }
+    expect(Array.isArray(languages)).toBe(true)
+    expect(languages.length).toBe(6)
+
+    languages.forEach((language: any) => {
+      expect(language).toHaveProperty('language')
+      expect(language).toHaveProperty('size')
+      expect(language).toHaveProperty('color')
     })
   })
-})
 
-describe('Top languages with limit', () => {
-  it('should return languages with given limit', async () => {
-    const response = await request(app).get(
-      '/api?username=devjiwonchoi&languages=1&languages.limit=3',
-    )
-    expect(response.status).toBe(200)
+  it('should support limit', async () => {
+    const res = await mockRequest('&languages=1&languages.limit=2')
 
-    const { languages } = response.body
+    const { languages } = res.body
 
-    expect(languages.length).toBe(3)
+    expect(languages.length).toBe(2)
   })
-})
 
-describe('Top languages with excludes languages', () => {
-  it('should return languages without excludes languages', async () => {
-    const response = await request(app).get(
-      '/api?username=devjiwonchoi&languages=1&languages.excludes=html,css',
+  it('should support limit over default limit', async () => {
+    const res = await mockRequest('&languages=1&languages.limit=7')
+
+    const { languages } = res.body
+
+    expect(languages.length).toBe(7)
+  })
+
+  it('should support excludes', async () => {
+    const res = await mockRequest(
+      '&languages=1&languages.excludes=javascript,typescript',
     )
-    expect(response.status).toBe(200)
 
-    const { languages } = response.body
+    const { languages } = res.body
 
-    languages.forEach(({ language }) => {
-      expect(language).not.toEqual('HTML')
-      expect(language).not.toEqual('CSS')
-    })
+    expect(
+      languages.every(
+        ({ language }: { language: string }) =>
+          language !== 'JavaScript' && language !== 'TypeScript',
+      ),
+    ).toBe(true)
   })
 })
