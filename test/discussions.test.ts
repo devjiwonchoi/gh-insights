@@ -1,57 +1,69 @@
-import request from 'supertest'
-import app from '../api'
+import { mockRequest } from './test-utils'
 
-describe('Basic discussions insights', () => {
-  it('should return name, login, started, comments, and answers', async () => {
-    const response = await request(app).get(
-      '/api?username=devjiwonchoi&discussions=1',
-    )
-    expect(response.status).toBe(200)
-    // TODO: Replace this to `image/svg+xml` when we return SVG
-    expect(response.type).toEqual('application/json')
-    expect(response.body).toHaveProperty('discussions')
-    expect(response.body.discussions).toHaveProperty('started')
-    expect(response.body.discussions).toHaveProperty('comments')
-    expect(response.body.discussions).toHaveProperty('answers')
+let repoListAll: string[] = []
+
+describe('Discussions Insights API', () => {
+  it('should support basic API', async () => {
+    const res = await mockRequest('&discussions=1')
+
+    expect(res.body).toHaveProperty('discussions')
+
+    const { discussions } = res.body
+
+    expect(discussions).toHaveProperty('started')
+    expect(discussions).toHaveProperty('comments')
+    expect(discussions).toHaveProperty('answers')
+
+    const { started, comments, answers } = discussions
+
+    expect(typeof started.totalCount === 'number').toBe(true)
+    expect(typeof comments.totalCount === 'number').toBe(true)
+    expect(typeof answers.totalCount === 'number').toBe(true)
   })
-})
 
-describe('Discussions', () => {
-  it('should return repo and avatarUrl of all participated discussions', async () => {
-    const response = await request(app).get(
-      '/api?username=devjiwonchoi&discussions=1&discussions.listRepo=1',
-    )
-    expect(response.status).toBe(200)
-    // TODO: Replace this to `image/svg+xml` when we return SVG
-    expect(response.type).toEqual('application/json')
-    expect(response.body).toHaveProperty('discussions')
+  it('should support listRepo', async () => {
+    const res = await mockRequest('&discussions=1&discussions.listRepo=1')
 
-    const {
-      discussions: { repoList },
-    } = response.body
+    const { discussions } = res.body
 
-    repoList.forEach((repo: any) => {
+    expect(discussions).toHaveProperty('repoList')
+
+    const { repoList } = discussions
+
+    expect(Array.isArray(repoList)).toBe(true)
+
+    repoListAll = repoList.map((repo: any) => {
       expect(repo).toHaveProperty('repo')
       expect(repo).toHaveProperty('avatarUrl')
+
+      return repo.repo
     })
   })
 
-  it('should return repo and avatarUrl of answered discussions', async () => {
-    const response = await request(app).get(
-      '/api?username=devjiwonchoi&discussions=1&discussions.listRepo=1&discussions.onlyAnswers=1',
+  it('should support nameWithOwner', async () => {
+    const res = await mockRequest(
+      '&discussions=1&discussions.listRepo=1&discussions.nameWithOwner=1',
     )
-    expect(response.status).toBe(200)
-    // TODO: Replace this to `image/svg+xml` when we return SVG
-    expect(response.type).toEqual('application/json')
-    expect(response.body).toHaveProperty('discussions')
 
     const {
       discussions: { repoList },
-    } = response.body
+    } = res.body
 
-    repoList.forEach((repo: any) => {
-      expect(repo).toHaveProperty('repo')
-      expect(repo).toHaveProperty('avatarUrl')
-    })
+    repoList.forEach(({ repo }: { repo: string }) =>
+      expect(repo).toContain('/'),
+    )
+  })
+
+  it('should support onlyAnswers', async () => {
+    const res = await mockRequest(
+      '&discussions=1&discussions.listRepo=1&discussions.onlyAnswers=1',
+    )
+
+    const {
+      discussions: { repoList },
+    } = res.body
+
+    // TODO: Not an accurate test. Need to find a better way to test this.
+    expect(repoList.length).toBeLessThan(repoListAll.length)
   })
 })

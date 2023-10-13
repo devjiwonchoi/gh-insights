@@ -1,6 +1,6 @@
 import { mockRequest } from './test-utils'
 
-describe('contributions API', () => {
+describe('Contributions Insights API', () => {
   it('should support basic API', async () => {
     const res = await mockRequest('&contributions=1')
 
@@ -8,6 +8,7 @@ describe('contributions API', () => {
 
     const { contributions } = res.body
 
+    expect(Array.isArray(contributions)).toBe(true)
     const contributionsRepoArray = contributions.map((contribution: any) => {
       expect(contribution).toHaveProperty('repo')
       expect(contribution).toHaveProperty('avatarUrl')
