@@ -7,3 +7,7 @@
 ### Contributions
 
 See [src/features/contributions/README.md](./src/features/contributions/README.md)
+
+### Discussions
+
+See [src/features/discussions/README.md](./src/features/discussions/README.md)
