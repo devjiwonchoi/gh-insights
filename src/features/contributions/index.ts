@@ -1,61 +1,96 @@
 import { fetcher, graphqlParser } from '../../utils'
 
-function handleNodes(
+function resolveContributionsNodes(
   nodes: any[],
-  stars?: string,
-  accountType?: string,
-  excludes?: string,
+  repoStars: number,
+  repoExcludesArray: string[],
+  includeUserRepo: boolean,
 ) {
-  const contribsMap = new Map<string, string>()
+  const contribsMap = new Map<string, any>()
 
   nodes.forEach((node: any) => {
     const {
       stargazerCount,
       isInOrganization,
       name,
+      nameWithOwner,
       owner: { login, avatarUrl },
     } = node
 
-    if (stars) {
-      const starsNumber = Number(stars)
-      if (stargazerCount < starsNumber) return
-    }
+    if (stargazerCount < repoStars) return
 
-    // if accountType is 'all', pass all repos. else, pass only isInOrganization repos
-    if (accountType !== 'all' && !isInOrganization) return
+    if (!includeUserRepo && !isInOrganization) return
 
-    if (excludes) {
-      const excludesArray = excludes
-        .split(',')
-        .map((name) => name.toLowerCase())
+    // TODO: Refactor to shorter code
+    if (repoExcludesArray.length > 0) {
+      const repoName = name.toLowerCase()
+      const repoOwner = login.toLowerCase()
+      const repoNameWithOwner = nameWithOwner ? nameWithOwner.toLowerCase() : ''
+
       if (
-        excludesArray.includes(name.toLowerCase()) ||
-        excludesArray.includes(login.toLowerCase())
-      )
+        repoExcludesArray.some(
+          (excluded) =>
+            excluded === repoName ||
+            excluded === repoOwner ||
+            excluded === repoNameWithOwner,
+        )
+      ) {
         return
+      }
     }
 
-    if (node.nameWithOwner) {
-      contribsMap.set(node.nameWithOwner, avatarUrl)
-    } else {
-      contribsMap.set(name, avatarUrl)
-    }
+    contribsMap.set(name, {
+      repo: nameWithOwner ? nameWithOwner : name,
+      avatarUrl,
+    })
   })
 
-  const contribs = Array.from(contribsMap.entries()).map(
-    ([name, avatarUrl]) => ({
-      name,
-      avatarUrl,
-    }),
-  )
-
-  return contribs
+  return Array.from(contribsMap.values())
 }
 
-async function getUserContributions(variables: any) {
+function handleContributionTypes(contributionTypes: string) {
+  const contributionTypesArray = contributionTypes
+    .split(',')
+    .map((type) => {
+      type = type.trim().toUpperCase()
+      switch (type) {
+        case 'COMMIT':
+          return type
+        case 'ISSUE':
+          return type
+        case 'PULL':
+          return 'PULL_REQUEST'
+        case 'REPO':
+          return 'REPOSITORY'
+        case 'REVIEW':
+          return 'PULL_REQUEST_REVIEW'
+        default:
+          return
+      }
+    })
+    .filter(Boolean)
+
+  return contributionTypesArray
+}
+
+export async function fetchContributionsData({
+  variables,
+  repoStars = '0',
+  repoExcludes,
+  contributionTypes = 'commit,issue,pull,repo,review',
+  includeUserRepo,
+}: {
+  variables: any
+  repoStars: string
+  repoExcludes: string
+  contributionTypes: string
+  includeUserRepo: boolean
+}) {
+  const contributionTypesArray = handleContributionTypes(contributionTypes)
+  variables.contributionTypes = contributionTypesArray
+
   const defaultQuery = await graphqlParser('contributions', 'default.gql')
   let nodesArray: any[] = []
-  // init loop
   let hasNextPage = true
 
   while (hasNextPage) {
@@ -63,6 +98,7 @@ async function getUserContributions(variables: any) {
       data: {
         user: {
           repositoriesContributedTo: {
+            // TODO: totalCount,
             nodes,
             pageInfo: { hasNextPage: newHasNextPage, endCursor },
           },
@@ -70,52 +106,18 @@ async function getUserContributions(variables: any) {
       },
     } = await fetcher(defaultQuery, variables)
     nodesArray = [...nodesArray, ...nodes]
-    variables = { ...variables, cursor: endCursor }
+    variables.cursor = endCursor
     hasNextPage = newHasNextPage
   }
 
-  return nodesArray
-}
+  const repoExcludesArray = repoExcludes
+    ? repoExcludes.split(',').map((name) => name.trim().toLowerCase())
+    : []
 
-export async function fetchContributionsData({
-  login,
-  stars,
-  owner,
-  accountType,
-  excludes,
-  type,
-}: {
-  login: string
-  stars: string
-  owner: string
-  accountType: string
-  excludes: string
-  type: string
-}) {
-  let variables: Record<string, any> = { login }
-  let contributionTypes: string[] = []
-  if (type) {
-    contributionTypes = type.split(',').map((el) => {
-      if (el === 'pull') return 'PULL_REQUEST'
-      if (el === 'repo') return 'REPOSITORY'
-      if (el === 'review') return 'PULL_REQUEST_REVIEW'
-
-      return el.toUpperCase()
-    })
-  } else {
-    contributionTypes = [
-      'COMMIT',
-      'ISSUE',
-      'PULL_REQUEST',
-      'REPOSITORY',
-      'PULL_REQUEST_REVIEW',
-    ]
-  }
-  variables.contributionTypes = contributionTypes
-
-  if (owner) variables = { ...variables, owner: true }
-
-  const nodesArray = await getUserContributions(variables)
-
-  return handleNodes(nodesArray, stars, accountType, excludes)
+  return resolveContributionsNodes(
+    nodesArray,
+    parseInt(repoStars),
+    repoExcludesArray,
+    includeUserRepo,
+  )
 }
