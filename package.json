@@ -5,7 +5,7 @@
   "main": "./dist/index.js",
   "scripts": {
     "dev": "dotenv -e .env nodemon ./src/dev-server.ts",
-    "test": "dotenv -e .env jest --env node",
+    "test": "dotenv -e .env jest",
     "lint-fix": "prettier --write .",
     "prepare": "husky install"
   },
@@ -29,6 +29,7 @@
     "typescript": "^5.2.2"
   },
   "jest": {
+    "testEnvironment": "node",
     "transform": {
       "^.+\\.(t|j)sx?$": "@swc/jest"
     },
