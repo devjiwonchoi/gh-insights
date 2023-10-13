@@ -10,7 +10,6 @@ query (
       after: $cursor
       contributionTypes: $contributionTypes
     ) {
-      totalCount
       nodes {
         stargazerCount
         isInOrganization
