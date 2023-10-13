@@ -1,8 +1,8 @@
 query (
   $login: String!
+  $nameWithOwner: Boolean!
   $cursor: String
   $contributionTypes: [RepositoryContributionType]
-  $owner: Boolean = false
 ) {
   user(login: $login) {
     repositoriesContributedTo(
@@ -10,12 +10,11 @@ query (
       after: $cursor
       contributionTypes: $contributionTypes
     ) {
-      totalCount
       nodes {
         stargazerCount
         isInOrganization
         name
-        nameWithOwner @include(if: $owner)
+        nameWithOwner @include(if: $nameWithOwner)
         owner {
           avatarUrl
           login

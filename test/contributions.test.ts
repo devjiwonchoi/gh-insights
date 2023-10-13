@@ -8,79 +8,76 @@ describe('Contributions insights', () => {
     )
     expect(response.status).toBe(200)
     expect(response.type).toEqual('application/json')
-    expect(response.body).toHaveProperty('contribs')
+    expect(response.body).toHaveProperty('contributions')
 
-    const { contribs } = response.body
+    const { contributions } = response.body
 
-    contribs.forEach((contrib: any) => {
-      expect(contrib).toHaveProperty('name')
+    contributions.forEach((contrib: any) => {
+      expect(contrib).toHaveProperty('repo')
       expect(contrib).toHaveProperty('avatarUrl')
     })
   })
 
-  it('should filter by stars', async () => {
+  it('should filter by repoStars', async () => {
     const response = await request(app).get(
-      '/api?username=devjiwonchoi&contributions=1&contributions.stars=100',
+      '/api?username=devjiwonchoi&contributions=1&contributions.repoStars=100',
     )
     expect(response.status).toBe(200)
     expect(response.type).toEqual('application/json')
-    expect(response.body).toHaveProperty('contribs')
+    expect(response.body).toHaveProperty('contributions')
 
-    const { contribs } = response.body
+    const { contributions } = response.body
 
-    contribs.forEach((contrib: any) => {
-      expect(contrib).toHaveProperty('name')
+    contributions.forEach((contrib: any) => {
+      expect(contrib).toHaveProperty('repo')
       expect(contrib).toHaveProperty('avatarUrl')
     })
   })
 
-  it('should support all account types', async () => {
+  it('should support includeUserRepo', async () => {
     const response = await request(app).get(
-      '/api?username=devjiwonchoi&contributions=1&contributions.accountType=all',
+      '/api?username=devjiwonchoi&contributions=1&contributions.includeUserRepo=1',
     )
     expect(response.status).toBe(200)
     expect(response.type).toEqual('application/json')
-    expect(response.body).toHaveProperty('contribs')
+    expect(response.body).toHaveProperty('contributions')
 
-    const { contribs } = response.body
+    const { contributions } = response.body
 
-    contribs.forEach((contrib: any) => {
-      expect(contrib).toHaveProperty('name')
-      expect(contrib).toHaveProperty('avatarUrl')
-    })
+    expect(contributions.some(({ repo }) => repo === 'bunchee')).toBe(true)
   })
 
-  it('should support owner/repo name', async () => {
+  it('should support nameWithOwner', async () => {
     const response = await request(app).get(
-      '/api?username=devjiwonchoi&contributions=1&contributions.owner=1',
+      '/api?username=devjiwonchoi&contributions=1&contributions.nameWithOwner=1',
     )
     expect(response.status).toBe(200)
     expect(response.type).toEqual('application/json')
-    expect(response.body).toHaveProperty('contribs')
+    expect(response.body).toHaveProperty('contributions')
 
-    const { contribs } = response.body
+    const { contributions } = response.body
 
-    contribs.forEach((contrib: any) => {
-      expect(contrib).toHaveProperty('name')
+    contributions.forEach((contrib: any) => {
+      expect(contrib).toHaveProperty('repo')
       expect(contrib).toHaveProperty('avatarUrl')
-      expect(contrib.name).toContain('/')
+      expect(contrib.repo).toContain('/')
     })
   })
 
   it('should support excludes repos', async () => {
     const response = await request(app).get(
-      '/api?username=devjiwonchoi&contributions=1&contributions.excludes=next.js',
+      '/api?username=devjiwonchoi&contributions=1&contributions.repoExcludes=next.js',
     )
     expect(response.status).toBe(200)
     expect(response.type).toEqual('application/json')
-    expect(response.body).toHaveProperty('contribs')
+    expect(response.body).toHaveProperty('contributions')
 
-    const { contribs } = response.body
+    const { contributions } = response.body
 
-    contribs.forEach((contrib: any) => {
-      expect(contrib).toHaveProperty('name')
+    contributions.forEach((contrib) => {
+      expect(contrib).toHaveProperty('repo')
       expect(contrib).toHaveProperty('avatarUrl')
-      expect(contrib.name).not.toContain('next.js')
+      expect(contrib.repo).not.toContain('next.js')
     })
   })
 })

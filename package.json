@@ -33,6 +33,7 @@
       "^.+\\.(t|j)sx?$": "@swc/jest"
     },
     "verbose": true,
+    "detectOpenHandles": true,
     "testTimeout": 10000
   },
   "prettier": {

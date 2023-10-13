@@ -1,6 +1,9 @@
 import express from 'express'
-import { fetchDiscussionsData, fetchLanguagesData } from '../src/features'
-import handleContributions from '../src/features/contributions'
+import {
+  fetchContributionsData,
+  fetchDiscussionsData,
+  fetchLanguagesData,
+} from '../src/features'
 
 const app = express()
 
@@ -24,24 +27,25 @@ app.get('/api', async (req, res) => {
   let result = {}
 
   if (contributions) {
-    const stars = req.query['contributions.stars'] as string
-    const owner = req.query['contributions.owner'] as string
-    // Allowed types: org, all
-    const accountType = req.query['contributions.accountType'] as string
-    const excludes = req.query['contributions.excludes'] as string
-    // Allowed types: COMMIT, ISSUE, PULL_REQUEST, REPOSITORY (created), PULL_REQUEST_REVIEW
-    // Queries: commit, issue, pull, repo, review
-    const type = req.query['contributions.type'] as string
+    const repoStars = req.query['contributions.repoStars'] as string
+    const repoExcludes = req.query['contributions.repoExcludes'] as string
+    const contributionTypes = req.query[
+      'contributions.contributionTypes'
+    ] as string
+    const includeUserRepo = !!req.query['contributions.includeUserRepo']
+    const nameWithOwner = !!req.query['contributions.nameWithOwner']
 
-    const contribs = await handleContributions({
-      login: username as string,
-      stars,
-      owner,
-      accountType,
-      excludes,
-      type,
+    const contributionsVariables = { ...variables, nameWithOwner }
+
+    const contributionsData = await fetchContributionsData({
+      variables: contributionsVariables,
+      repoStars,
+      repoExcludes,
+      contributionTypes,
+      includeUserRepo,
     })
-    result = { ...result, contribs }
+
+    result = { ...result, contributions: contributionsData }
   }
 
   if (discussions) {
@@ -49,10 +53,12 @@ app.get('/api', async (req, res) => {
     const nameWithOwner = listRepo && !!req.query['discussions.nameWithOwner']
     const onlyAnswers = listRepo && !!req.query['discussions.onlyAnswers']
 
-    variables.nameWithOwner = nameWithOwner
-    variables.onlyAnswers = onlyAnswers
+    const discussionsVariables = { ...variables, nameWithOwner, onlyAnswers }
 
-    const discussionsData = await fetchDiscussionsData({ variables, listRepo })
+    const discussionsData = await fetchDiscussionsData({
+      variables: discussionsVariables,
+      listRepo,
+    })
 
     result = { ...result, discussions: discussionsData }
   }
