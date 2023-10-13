@@ -1,3 +1,4 @@
+import { ContributionType, QueryVariables } from '../../types'
 import { fetcher, graphqlParser } from '../../utils'
 
 function resolveContributionsNodes(
@@ -6,7 +7,13 @@ function resolveContributionsNodes(
   repoExcludesArray: string[],
   includeUserRepo: boolean,
 ) {
-  const contribsMap = new Map<string, any>()
+  const contribsMap = new Map<
+    string,
+    {
+      repo: string
+      avatarUrl: string
+    }
+  >()
 
   nodes.forEach((node: any) => {
     const {
@@ -48,27 +55,28 @@ function resolveContributionsNodes(
   return Array.from(contribsMap.values())
 }
 
-function handleContributionTypes(contributionTypes: string) {
-  const contributionTypesArray = contributionTypes
-    .split(',')
-    .map((type) => {
-      type = type.trim().toUpperCase()
-      switch (type) {
-        case 'COMMIT':
-          return type
-        case 'ISSUE':
-          return type
-        case 'PULL':
-          return 'PULL_REQUEST'
-        case 'REPO':
-          return 'REPOSITORY'
-        case 'REVIEW':
-          return 'PULL_REQUEST_REVIEW'
-        default:
-          return
-      }
-    })
-    .filter(Boolean)
+function handleContributionTypes(
+  contributionTypes: string,
+): ContributionType[] {
+  const contributionTypesArray = contributionTypes.split(',').map((type) => {
+    type = type.trim().toUpperCase()
+    switch (type) {
+      case 'COMMIT':
+        return type
+      case 'ISSUE':
+        return type
+      case 'PULL':
+        return 'PULL_REQUEST'
+      case 'REPO':
+        return 'REPOSITORY'
+      case 'REVIEW':
+        return 'PULL_REQUEST_REVIEW'
+      default:
+        throw new Error(
+          `Invalid contribution type: ${type}. Valid types are: commit, issue, pull, repo, review`,
+        )
+    }
+  })
 
   return contributionTypesArray
 }
@@ -80,7 +88,7 @@ export async function fetchContributionsData({
   contributionTypes = 'commit,issue,pull,repo,review',
   includeUserRepo,
 }: {
-  variables: any
+  variables: QueryVariables
   repoStars: string
   repoExcludes: string
   contributionTypes: string
