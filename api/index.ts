@@ -3,8 +3,8 @@ import {
   fetchContributionsData,
   fetchDiscussionsData,
   fetchLanguagesData,
-} from '@/features'
-import { QueryVariables } from '@/types'
+} from '../src/features'
+import { QueryVariables } from '../src/types'
 
 const app = express()
 
