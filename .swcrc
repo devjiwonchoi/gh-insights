@@ -1,7 +1,7 @@
 {
   "jsc": {
     "parser": {
-      "syntax": "ts"
+      "syntax": "typescript"
     },
     "baseUrl": "./",
     "paths": {
