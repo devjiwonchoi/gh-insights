@@ -1,5 +1,5 @@
-import { ContributionType, QueryVariables } from '@/types'
-import { fetcher, graphqlParser } from '@/utils'
+import { ContributionType, QueryVariables } from '../../types'
+import { fetcher, graphqlParser } from '../../utils'
 
 function resolveContributionsNodes(
   nodes: any[],

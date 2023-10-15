@@ -1,5 +1,5 @@
-import { fetcher, graphqlParser } from '@/utils'
-import { QueryVariables } from '@/types'
+import { fetcher, graphqlParser } from '../../utils'
+import { QueryVariables } from '../../types'
 
 function resolveDiscussionsNodes(nodes: any[]) {
   const reposMap = new Map<
