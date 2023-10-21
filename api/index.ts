@@ -20,7 +20,7 @@ app.get('/api', async (req, res) => {
   if (!process.env.GH_ACCESS_TOKEN) {
     return res.status(401).json({
       message:
-        'Invalid GitHub Token. Please report this issue at https://github.com/devjiwonchoi/insights/issues',
+        'Invalid GitHub Token. Please report this issue at https://github.com/devjiwonchoi/gh-insights/issues',
     })
   }
 
