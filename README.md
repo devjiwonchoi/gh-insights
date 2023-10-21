@@ -1,4 +1,4 @@
-# insights 💡
+# GitHub Insights 💡
 
 > This README is temporarily created for development.
 
